@@ -1,17 +1,35 @@
+// app/layout.tsx
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "OrcaTrading — Automate, Analyze, Trade Smarter",
-  description:
-    "OrcaTrading unites automation and market analytics in one transparent ecosystem.",
+  title: "OrcaTrading",
+  description: "Automate, analyze, trade smarter.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="font-sans text-[var(--foreground)] bg-[var(--background)] antialiased">
-        {children}
+    <html lang="en" className="h-full bg-[#0A0F1A]">
+      {/* 
+        NOTE:
+        - overflow-x-hidden on <body> bans horizontal scroll.
+        - overflow-x-clip on main isolates any decorative off-screen elements.
+      */}
+      <body className="min-h-dvh overflow-x-hidden antialiased">
+        <main className="relative isolate overflow-x-clip">
+          {children}
+        </main>
       </body>
     </html>
   );

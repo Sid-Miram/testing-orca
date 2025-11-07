@@ -1,158 +1,113 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* app/globals.css */
 
-/* ================================
-   OrcaTrading Theme (Dark)
-   ================================ */
+/* --------- Base resets ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* last line of defense against sideways scroll */
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  color: #E6EEF8;
+  background: #0A0F1A; /* fallback background */
+  line-height: 1.5;
+}
+
+/* Make media never blow past the viewport */
+img, svg, video, canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent long words or buttons from creating overflow */
+:where(p, h1, h2, h3, h4, h5, h6, li, a, button, .btn) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* --------- Typography that scales on mobile ---------- */
 :root {
-  --bg:            #0b1220;
-  --panel:         #0f1729;
-  --muted-text:    #a5b4cf;
-  --primary:       #22d3ee;
-  --primary-600:   #0891b2;
-  --accent:        #34d399;
-  --danger:        #ef4444;
-
-  --background:               var(--bg);
-  --foreground:               #e8eefc;
-
-  --card:                     var(--panel);
-  --card-foreground:          #e8eefc;
-
-  --popover:                  var(--panel);
-  --popover-foreground:       #e8eefc;
-
-  --primary-foreground:       #06202a;
-  --secondary:                #ecfeff;
-  --secondary-foreground:     #06202a;
-
-  --muted:                    rgba(255,255,255,0.06);
-  --muted-foreground:         var(--muted-text);
-
-  --accent-bg:                rgba(255,255,255,0.06);
-  --accent-foreground:        #e8eefc;
-
-  --destructive:              var(--danger);
-  --destructive-foreground:   #ffffff;
-
-  --border:                   rgba(255,255,255,0.08);
-  --input:                    rgba(255,255,255,0.1);
-  --ring:                     var(--primary);
-
-  --radius:                   0.75rem;
+  --fs-h1: clamp(2rem, 7vw, 4.25rem);
+  --fs-h2: clamp(1.5rem, 5.5vw, 3rem);
+  --fs-h3: clamp(1.25rem, 4.5vw, 2rem);
+  --page-max: 1200px;
 }
 
-/* Optional light mode */
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #ffffff;
-    --foreground: #0b1220;
+h1 { font-size: var(--fs-h1); line-height: 1.05; }
+h2 { font-size: var(--fs-h2); line-height: 1.1; }
+h3 { font-size: var(--fs-h3); line-height: 1.15; }
 
-    --card: #ffffff;
-    --card-foreground: #0b1220;
+/* --------- Layout helpers ---------- */
 
-    --popover: #ffffff;
-    --popover-foreground: #0b1220;
-
-    --primary: #0891b2;
-    --primary-foreground: #ffffff;
-
-    --secondary: #0b1220;
-    --secondary-foreground: #ffffff;
-
-    --muted: #f1f5f9;
-    --muted-foreground: #475569;
-
-    --accent-bg: #f1f5f9;
-    --accent-foreground: #0b1220;
-
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #22d3ee;
-  }
+/* Safe centered container (use this class around section inner content) */
+.container {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 24px);
 }
 
-/* ================================
-   Base styles
-   ================================ */
-@layer base {
-  * { border-color: var(--border); }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--background);
-    color: var(--foreground);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-
-  /* reset links + strong headings for “preview” look */
-  a { text-decoration: none; color: inherit; }
-  h1,h2,h3 { font-weight: 800; }
+/* Section padding that adapts by screen size */
+.site-section {
+  padding-block: clamp(48px, 8vw, 120px);
 }
 
-/* Selection + focus */
-::selection {
-  background: color-mix(in oklab, var(--primary) 35%, transparent);
-  color: #ffffff;
-}
-:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 60%, transparent);
+/* Kill horizontal overflow from transforms / glowing shadows / grid backgrounds */
+.overflow-clip-hard {
+  overflow-x: clip;
+  overflow-clip-margin: content-box;
 }
 
-/* Glow + grid utilities */
-.orca-glow { position: relative; }
-.orca-glow::before {
-  content: "";
-  position: absolute;
-  inset: -200px;
-  pointer-events: none;
-  background: radial-gradient(
-    60% 60% at 50% 40%,
-    color-mix(in oklab, var(--primary) 18%, transparent) 0%,
-    transparent 60%
-  );
-  z-index: 0;
+/* Cards & columns: stack on mobile, grow to grid later */
+.grid-1-2-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(12px, 3.5vw, 24px);
 }
-.orca-grid::after {
-  content: "";
+@media (min-width: 640px) {
+  .grid-1-2-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .grid-1-2-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Buttons shouldn’t cause overflow */
+.button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  white-space: normal; /* allow wrap on mobile */
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+}
+
+/* If you had any fixed widths causing trouble, this neutralizes them globally */
+[class*="w-["] { max-width: 100% !important; }
+[class*="min-w-["] { min-width: 0 !important; }
+
+/* Utility if you want a section background decoration but no side scroll */
+.section-island {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+.section-island > .decoration {
   position: absolute;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.4;
-  z-index: 0;
-}
-
-/* Panels / helpers */
-.orca-panel {
-  background: color-mix(in oklab, var(--panel) 95%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-}
-.text-muted { color: var(--muted-text); }
-.orca-divider { border-top: 1px solid var(--border); }
-
-/* Scrollbar */
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
-*::-webkit-scrollbar-track { background: transparent; }
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
