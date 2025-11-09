@@ -1,36 +1,45 @@
-// app/dashboard/page.tsx
-import StatCard from "./components/StatCard";
-import AreaChart from "./components/AreaChart";
-import DataTable from "./components/DataTable";
+"use client";
+import dynamic from "next/dynamic";
+import { useState } from "react";
 
-/** Demo data to make it feel real (replace with API later) */
-const series = Array.from({ length: 36 }, (_, i) => ({
-  x: `T${i}`,
-  y: 60 + Math.sin(i / 2.4) * 18 + (i % 7) - 3,
-}));
+// Lazy-load the Figma components on the client
+const Sidebar = dynamic(() => import("./components/Sidebar"), { ssr: false });
 
-const rows = [
-  { symbol: "AAPL", regime: "Bull", trend: 82, change: "+1.2%", volume: "54M" },
-  { symbol: "NVDA", regime: "Bull", trend: 88, change: "+2.0%", volume: "42M" },
-  { symbol: "TSLA", regime: "Bear", trend: 41, change: "-0.8%", volume: "36M" },
-  { symbol: "MSFT", regime: "Bull", trend: 75, change: "+0.6%", volume: "28M" },
-];
+// Sections
+const PremiumScreenerSection   = dynamic(() => import("./components/PremiumScreenerSection"), { ssr: false });
+const WatchlistSection         = dynamic(() => import("./components/WatchlistSection"),         { ssr: false });
+const SavedAlertsSection       = dynamic(() => import("./components/SavedAlertsSection"),       { ssr: false });
+const FiltersSettingsSection   = dynamic(() => import("./components/FiltersSettingsSection"),   { ssr: false });
+const TrendingSection          = dynamic(() => import("./components/TrendingSection"),          { ssr: false });
+const ToolsSection             = dynamic(() => import("./components/ToolsSection"),             { ssr: false });
+const BotSection               = dynamic(() => import("./components/BotSection"),               { ssr: false });
+const AccountSection           = dynamic(() => import("./components/AccountSection"),           { ssr: false });
+const SubscriptionSection      = dynamic(() => import("./components/SubscriptionSection"),      { ssr: false });
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  const [active, setActive] = useState<string>("screener");
+
   return (
-    <div className="space-y-6">
-      {/* Stat cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard label="Market Regime" value="Bullish" delta="+3d" />
-        <StatCard label="Trend Breadth" value="62%" delta="+5% vs 7d" />
-        <StatCard label="Alerts (24h)" value="12" delta="3 resolved" />
+    <div className="min-h-dvh flex" data-theme="dashboard">
+      {/* Sidebar (your Figma sidebar uses fixed width ~280px) */}
+      <div className="hidden lg:block">
+        <Sidebar activeSection={active} onSectionChange={setActive} />
       </div>
 
-      {/* Main chart */}
-      <AreaChart title="Composite Trend" data={series} />
-
-      {/* Table */}
-      <DataTable rows={rows} />
+      {/* Content area; offset for fixed/floating sidebar on large screens */}
+      <div className="flex-1 w-full lg:ml-[280px]">
+        <div className="p-4 md:p-6 lg:p-8 space-y-6">
+          {active === "screener"      && <PremiumScreenerSection />}
+          {active === "watchlist"     && <WatchlistSection />}
+          {active === "alerts"        && <SavedAlertsSection />}
+          {active === "filters"       && <FiltersSettingsSection />}
+          {active === "trending"      && <TrendingSection />}
+          {active === "tools"         && <ToolsSection />}
+          {active === "bot"           && <BotSection />}
+          {active === "account"       && <AccountSection />}
+          {active === "subscription"  && <SubscriptionSection />}
+        </div>
+      </div>
     </div>
   );
 }
