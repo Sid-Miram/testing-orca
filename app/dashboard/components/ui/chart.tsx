@@ -4,19 +4,23 @@ import * as React from "react";
 import type { CSSProperties, ReactNode } from "react";
 import {
   Tooltip as RechartsTooltip,
-  type TooltipProps as RTooltipProps,
-  type LegendProps,
-  type TooltipProps,
-  type ValueType,
-  type NameType,
+  // NOTE: some Recharts versions don't export these types consistently.
+  // We only import the component and keep our own light typings below.
 } from "recharts";
 
-// If your project uses a different utilities path for `cn`, update this import.
+// If your `cn` lives elsewhere, tweak this import:
 import { cn } from "./utils";
 
 /* -------------------------------------------------------------------------------------------------
- * Types
+ * Light, version-agnostic tooltip typings
  * -----------------------------------------------------------------------------------------------*/
+
+// The only bits we actually read from Recharts tooltip props.
+type TooltipLike = {
+  active?: boolean;
+  payload?: any[]; // array of { value, name, color, dataKey, ... }
+  label?: any;
+};
 
 export type ChartIndicator = "dot" | "line" | "dashed";
 
@@ -25,7 +29,7 @@ export type ChartConfig = Record<
   {
     /** Human label for a series/dataKey. */
     label?: string;
-    /** CSS color (used to theme the tooltip indicator). */
+    /** CSS color (used for indicators). */
     color?: string;
   }
 >;
@@ -34,27 +38,22 @@ export type ChartContainerProps = {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
-  /** Series config; keys should match your Recharts `dataKey` values. */
+  /** Keys should match your Recharts `dataKey`s. */
   config?: ChartConfig;
 };
 
-export type ChartTooltipContentProps = Partial<
-  TooltipProps<ValueType, NameType>
-> & {
+export type ChartTooltipContentProps = Partial<TooltipLike> & {
   className?: string;
   indicator?: ChartIndicator;
   hideLabel?: boolean;
 };
 
 /* -------------------------------------------------------------------------------------------------
- * Context
+ * Context for series config (labels/colors)
  * -----------------------------------------------------------------------------------------------*/
 
 const ChartConfigCtx = React.createContext<ChartConfig | undefined>(undefined);
-
-function useChartConfig() {
-  return React.useContext(ChartConfigCtx);
-}
+const useChartConfig = () => React.useContext(ChartConfigCtx);
 
 /* -------------------------------------------------------------------------------------------------
  * Container
@@ -66,7 +65,7 @@ export function ChartContainer({
   style,
   config,
 }: ChartContainerProps) {
-  // Expose series colors as CSS variables so child components can reference them if desired.
+  // Expose each series color as a CSS var: --color-<dataKey>
   const cssVars: CSSProperties = { ...style };
   if (config) {
     for (const [key, value] of Object.entries(config)) {
@@ -86,34 +85,31 @@ export function ChartContainer({
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Tooltip (wrapper) — provides sane defaults and our content component
+ * Tooltip (wrapper) — keeps defaults and wires our content
  * -----------------------------------------------------------------------------------------------*/
 
+type AnyTooltipProps = Record<string, any>;
+
 export function ChartTooltip(
-  props: Omit<RTooltipProps<ValueType, NameType>, "content"> & {
-    content?: RTooltipProps<ValueType, NameType>["content"];
+  props: Omit<AnyTooltipProps, "content"> & {
+    content?: AnyTooltipProps["content"];
   },
 ) {
   const content =
-    props.content ?? ((p) => <ChartTooltipContent {...(p as any)} />);
+    props.content ?? ((p: TooltipLike) => <ChartTooltipContent {...p} />);
 
   return (
     <RechartsTooltip
       {...props}
       wrapperStyle={{ outline: "none" }}
-      cursor={{
-        fill: "hsl(var(--muted, 210 20% 95%))",
-        opacity: 0.35,
-      }}
+      cursor={{ fill: "hsl(var(--muted, 210 20% 95%))", opacity: 0.35 }}
       content={content}
     />
   );
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Tooltip Content — FIXED TYPINGS
- *  - We type against Partial<TooltipProps> so Recharts minor changes don’t break builds.
- *  - Works with single or multi-series payloads.
+ * Tooltip Content — robust to Recharts version differences
  * -----------------------------------------------------------------------------------------------*/
 
 export function ChartTooltipContent({
@@ -128,11 +124,10 @@ export function ChartTooltipContent({
 
   if (!active || !payload || payload.length === 0) return null;
 
-  // Render all items when multiple series are hovered.
-  const items = payload as unknown as Array<{
+  const items = payload as Array<{
     color?: string;
     name?: string;
-    value?: ValueType;
+    value?: unknown;
     dataKey?: string | number;
   }>;
 
@@ -152,15 +147,14 @@ export function ChartTooltipContent({
 
       <div className="space-y-1">
         {items.map((it, idx) => {
-          // Prefer explicit config label if available.
+          const dk = it.dataKey;
           const human =
-            (typeof it.dataKey === "string" && config?.[it.dataKey]?.label) ??
+            (typeof dk === "string" && config?.[dk]?.label) ??
             it.name ??
-            (typeof it.dataKey === "string" ? it.dataKey : `Series ${idx + 1}`);
+            (typeof dk === "string" ? dk : `Series ${idx + 1}`);
 
           const color =
-            (typeof it.dataKey === "string" && config?.[it.dataKey]?.color) ??
-            it.color;
+            (typeof dk === "string" && config?.[dk]?.color) ?? it.color;
 
           return (
             <div key={idx} className="flex items-center gap-2">
@@ -192,11 +186,10 @@ export function ChartTooltipContent({
 }
 
 /* -------------------------------------------------------------------------------------------------
- * (Optional) Legend content stub, if you need it later.
+ * Legend stub (optional)
  * -----------------------------------------------------------------------------------------------*/
 
-export function ChartLegendContent(_props: LegendProps) {
-  // Implement as needed for your design system; keeping it minimal here.
+export function ChartLegendContent() {
   return null;
 }
 
