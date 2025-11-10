@@ -1,43 +1,49 @@
-"use client";
-import dynamic from "next/dynamic";
-import { useState } from "react";
+// app/dashboard/page.tsx
+import Sidebar from "./components/Sidebar";
+import ScreenerTable from "./components/ScreenerTable";
+import { Download, RefreshCw, ChevronDown, Search } from "lucide-react";
 
-// Lazy-load the Figma components on the client
-const Sidebar = dynamic(() => import("./components/Sidebar"), { ssr: false });
-
-// Sections
-const PremiumScreenerSection   = dynamic(() => import("./components/PremiumScreenerSection"), { ssr: false });
-const WatchlistSection         = dynamic(() => import("./components/WatchlistSection"),         { ssr: false });
-const SavedAlertsSection       = dynamic(() => import("./components/SavedAlertsSection"),       { ssr: false });
-const FiltersSettingsSection   = dynamic(() => import("./components/FiltersSettingsSection"),   { ssr: false });
-const TrendingSection          = dynamic(() => import("./components/TrendingSection"),          { ssr: false });
-const ToolsSection             = dynamic(() => import("./components/ToolsSection"),             { ssr: false });
-const BotSection               = dynamic(() => import("./components/BotSection"),               { ssr: false });
-const AccountSection           = dynamic(() => import("./components/AccountSection"),           { ssr: false });
-const SubscriptionSection      = dynamic(() => import("./components/SubscriptionSection"),      { ssr: false });
-
-export default function DashboardPage() {
-  const [active, setActive] = useState<string>("screener");
-
+export default function Dashboard() {
   return (
-    <div className="min-h-dvh flex" data-theme="dashboard">
-      {/* Sidebar (your Figma sidebar uses fixed width ~280px) */}
-      <div className="hidden lg:block">
-        <Sidebar activeSection={active} onSectionChange={setActive} />
-      </div>
+    <div className="min-h-dvh grid grid-cols-1 lg:grid-cols-[280px_1fr]">
+      {/* Sidebar (real content) */}
+      <aside className="hidden lg:block">
+        <Sidebar />
+      </aside>
 
-      {/* Content area; offset for fixed/floating sidebar on large screens */}
-      <div className="flex-1 w-full lg:ml-[280px]">
-        <div className="p-4 md:p-6 lg:p-8 space-y-6">
-          {active === "screener"      && <PremiumScreenerSection />}
-          {active === "watchlist"     && <WatchlistSection />}
-          {active === "alerts"        && <SavedAlertsSection />}
-          {active === "filters"       && <FiltersSettingsSection />}
-          {active === "trending"      && <TrendingSection />}
-          {active === "tools"         && <ToolsSection />}
-          {active === "bot"           && <BotSection />}
-          {active === "account"       && <AccountSection />}
-          {active === "subscription"  && <SubscriptionSection />}
+      {/* Main content */}
+      <div className="min-h-dvh">
+        {/* Header */}
+        <div className="px-4 md:px-6 lg:px-8 pt-6 pb-4">
+          <h1 className="text-2xl md:text-3xl font-semibold">Premium Screener</h1>
+          <p className="mt-2 text-sm" style={{ color: "var(--text-soft)" }}>
+            Real-time multi-timeframe trend analysis
+          </p>
+
+          {/* Filters row */}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <button className="btn flex items-center gap-2">
+              All Asset Classes <ChevronDown className="h-4 w-4" />
+            </button>
+            <button className="btn flex items-center gap-2">
+              All Trends <ChevronDown className="h-4 w-4" />
+            </button>
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-soft)" }} />
+              <input className="input pl-9 w-[220px]" placeholder="Search symbols..." />
+            </div>
+            <div className="btn flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" /> Last updated: 2 mins ago
+            </div>
+            <button className="btn btn-primary flex items-center gap-2">
+              <Download className="h-4 w-4" /> Export
+            </button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="px-4 md:px-6 lg:px-8 pb-8">
+          <ScreenerTable />
         </div>
       </div>
     </div>

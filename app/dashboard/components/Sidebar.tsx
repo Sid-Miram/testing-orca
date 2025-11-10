@@ -1,82 +1,98 @@
-import { Star, Bell, SlidersHorizontal, TrendingUp, Grid, Bot, User, Crown, BarChart3 } from "lucide-react";
-import { Badge } from "./ui/badge";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+// app/dashboard/components/Sidebar.tsx
+"use client";
 
-interface SidebarProps {
-  activeSection: string;
-  onSectionChange: (section: string) => void;
-}
+import Link from "next/link";
+import {
+  LayoutGrid,
+  LineChart,
+  Bell,
+  Settings,
+  ListChecks,
+  Stars,
+  Zap,
+  Bot,
+  Crown,
+} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { cn } from "./utils"; // add simple helper below if you don't have one
 
-export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
-  const navItems = [
-    { id: "screener", label: "Premium Screener", icon: BarChart3 },
-    { id: "watchlist", label: "Watchlist", icon: Star },
-    { id: "alerts", label: "Saved Alerts", icon: Bell },
-    { id: "filters", label: "Filters & Settings", icon: SlidersHorizontal },
-    { id: "trending", label: "Trending Assets", icon: TrendingUp },
-    { id: "tools", label: "Tools & Features", icon: Grid },
-    { id: "bot", label: "Bot Integration", icon: Bot, badge: "Coming Soon" },
-    { id: "account", label: "Account Settings", icon: User },
-    { id: "subscription", label: "Subscription", icon: Crown },
+export default function Sidebar() {
+  const pathname = usePathname();
+  const r = useRouter();
+
+  const items = [
+    { key: "screener", label: "Premium Screener", icon: LineChart, href: "/dashboard" },
+    { key: "watchlist", label: "Watchlist", icon: ListChecks, href: "/dashboard?tab=watchlist" },
+    { key: "alerts", label: "Saved Alerts", icon: Bell, href: "/dashboard?tab=alerts" },
+    { key: "filters", label: "Filters & Settings", icon: Stars, href: "/dashboard?tab=filters" },
+    { key: "trending", label: "Trending Assets", icon: Zap, href: "/dashboard?tab=trending" },
+    { key: "tools", label: "Tools & Features", icon: Crown, href: "/dashboard?tab=tools" },
+    { key: "bot", label: "Bot Integration", icon: Bot, href: "/dashboard?tab=bot" },
+    { key: "settings", label: "Account Settings", icon: Settings, href: "/dashboard?tab=settings" },
+    { key: "sub", label: "Subscription", icon: Crown, href: "/dashboard?tab=sub" },
   ];
 
   return (
-    <div className="w-[280px] h-screen bg-[#14181F] border-r border-[#1E293B] flex flex-col fixed left-0 top-0">
-      {/* Logo/Brand */}
-      <div className="p-6 border-b border-[#1E293B]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#00D4FF] to-[#0EA5E9] rounded-lg flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className="text-white font-semibold">Flowscreener</div>
-            <div className="text-[#94A3B8] text-sm">by OrcaTrading</div>
+    <div className="sticky top-0 h-dvh flex flex-col" style={{ color: "var(--text)", background: "var(--bg)" }}>
+      {/* Brand */}
+      <div className="flex items-center gap-3 px-5 h-16 border-b" style={{ borderColor: "var(--border)" }}>
+        <div
+          className="h-9 w-9 rounded-xl"
+          style={{
+            background:
+              "linear-gradient(135deg, var(--primary-600), var(--accent-500))",
+          }}
+        />
+        <div>
+          <div className="font-semibold leading-tight">Flowscreener</div>
+          <div className="text-xs" style={{ color: "var(--text-soft)" }}>
+            by OrcaTrading
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeSection === item.id;
-
+        {items.map((it) => {
+          const active = pathname === "/dashboard" && it.key === "screener";
           return (
-            <button
-              key={item.id}
-              onClick={() => onSectionChange(item.id)}
-              className={`
-                w-full flex items-center gap-3 px-5 py-3 transition-all duration-200
-                ${isActive 
-                  ? "text-[#00D4FF] bg-[#1A1F2E] border-l-4 border-[#00D4FF]" 
-                  : "text-[#94A3B8] hover:text-white hover:bg-[#1A1F2E] border-l-4 border-transparent"
-                }
-              `}
-            >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              <span className="flex-1 text-left">{item.label}</span>
-              {item.badge && (
-                <Badge variant="secondary" className="bg-[#0EA5E9] text-white text-xs px-2 py-0">
-                  {item.badge}
-                </Badge>
+            <Link
+              key={it.key}
+              href={it.href}
+              className={cn(
+                "mx-3 my-1 flex items-center gap-3 px-3 py-2 rounded-xl border",
+                active ? "bg-[var(--bg-elev-2)]" : "bg-transparent"
               )}
-            </button>
+              style={{ borderColor: active ? "var(--border)" : "transparent", color: active ? "var(--text)" : "var(--text-muted)" }}
+            >
+              <it.icon className="h-4 w-4" />
+              <span className="text-sm">{it.label}</span>
+              {it.key === "bot" && (
+                <span className="ml-auto chip" style={{ fontSize: 11 }}>Coming Soon</span>
+              )}
+            </Link>
           );
         })}
       </nav>
 
-      {/* User Profile */}
-      <div className="p-5 border-t border-[#1E293B]">
+      {/* User */}
+      <div className="p-4 border-t" style={{ borderColor: "var(--border)" }}>
         <div className="flex items-center gap-3">
-          <Avatar className="w-10 h-10">
-            <AvatarFallback className="bg-[#0EA5E9] text-white">JD</AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <div className="text-white text-sm">John Doe</div>
-            <Badge className="bg-[#FFD700] text-black text-xs mt-1">Premium</Badge>
+          <div className="h-8 w-8 rounded-full bg-[var(--bg-elev-2)] grid place-items-center text-sm">JD</div>
+          <div className="text-sm">
+            <div>John Doe</div>
+            <span className="chip" style={{ fontSize: 11, background: "var(--chip-bull)", color: "var(--chip-bull-text)", borderColor: "transparent" }}>
+              Premium
+            </span>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+// minimal cn helper if you don't already have it
+export function cn(...c: (string | false | null | undefined)[]) {
+  return c.filter(Boolean).join(" ");
+}
+
