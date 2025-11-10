@@ -5,34 +5,29 @@ import { DayPicker, type DayPickerProps } from "react-day-picker";
 import { ChevronLeft, ChevronRight, type LucideProps } from "lucide-react";
 import { cn } from "./utils";
 
-// Explicitly describe just the icon renderers we use.
-// We'll cast when supplying to DayPicker to avoid version/type drift.
+// Define icon component types
 type CustomIcon = (props: LucideProps) => React.ReactNode;
 type CustomComponents = {
   IconLeft?: CustomIcon;
   IconRight?: CustomIcon;
 };
 
-// Omit 'components' (we manage it) and **omit 'required'**
-// (RDP’s types don't accept it, even if HTML attrs might).
-export type CalendarProps = Omit<DayPickerProps, "components" | "required"> & {
+// Add `required` as an optional prop we swallow
+export type CalendarProps = Omit<DayPickerProps, "components"> & {
+  required?: boolean;
   components?: Partial<CustomComponents>;
 };
 
 export function Calendar({
   className,
   components,
-  // strip anything named `required` to avoid passing it down
-  // (if a parent typed it in their HTML props union)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  required: _required,
+  required: _required, // strip `required`
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
       className={cn("p-3", className)}
-      // Some RDP versions don't declare IconLeft/IconRight in the
-      // CustomComponents type even though they work at runtime.
+      // Handle icons safely with version flexibility
       components={
         {
           IconLeft: (iconProps: LucideProps) => (
