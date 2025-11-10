@@ -1,18 +1,15 @@
-// app/dashboard/layout.tsx
-import type { ReactNode } from "react";
-import "./dashboard.css";   // existing scoped styles
+import React from "react"
+import "./dashboard.css"
+import { Sidebar } from "./components/sidebar"
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      data-theme="dashboard"
-      className="min-h-dvh grid grid-cols-1 lg:grid-cols-[280px_1fr]"
-      style={{ background: "var(--bg)" }}
-    >
-      {/* Sidebar is rendered inside page to keep it sticky; this slot is for structure only */}
-      <aside className="hidden lg:block border-r" style={{ borderColor: "var(--border)" }} />
-      <main className="min-h-dvh">{children}</main>
+    <div className="dashboard-theme min-h-dvh">
+      <div style={{ display: "flex" }}>
+        <Sidebar />
+        <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
+      </div>
     </div>
-  );
+  )
 }
 
