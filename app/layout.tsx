@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import './tokens.css';
+import { Navbar } from './components/navbar';
 
 export const metadata: Metadata = {
   title: "OrcaTrading — Automate, Analyze, Trade Smarter",
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Navbar />
         <div className="site">
           {children}
         </div>
@@ -24,4 +26,3 @@ export default function RootLayout({
     </html>
   );
 }
-
