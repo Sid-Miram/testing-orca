@@ -1,8 +1,8 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import "./globals.css";
-import './tokens.css';
-import { Navbar } from './components/navbar';
+import "./styles/globals.css";
+import "./styles/tokens.css";
+import { Navbar } from "./_components/navbar";
 
 export const metadata: Metadata = {
   title: "OrcaTrading — Automate, Analyze, Trade Smarter",

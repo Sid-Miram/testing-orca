@@ -1,7 +1,8 @@
-// app/components/layout/navbar.tsx
+// app/_components/navbar/navbar.tsx
 'use client'
 
 import { useState } from 'react'
+import './navbar.css'
 
 // Temporary: Mock user type (replace with real auth later)
 type User = {
@@ -10,11 +11,7 @@ type User = {
 } | null
 
 // Temporary: Toggle this to test logged-in/logged-out states
-//const MOCK_USER: User = null // Change to { name: "John Doe", email: "john@example.com" } to test
-const MOCK_USER: User = {
-  name : "Gouransh Vaishnav",
-  email : "gouransh29@gmail.com"
-}
+const MOCK_USER: User = null // Change to { name: "John Doe", email: "john@example.com" } to test
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
