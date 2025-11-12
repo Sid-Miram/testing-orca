@@ -4,7 +4,7 @@ export default function Page() {
   return (
     <>
       {/* ---------- HERO ---------- */}
-      <header className="section no-x-scroll" style={{ paddingTop: "3.5rem" }}>
+      <header className="section no-x-scroll">
         <div className="container">
           <p className="eyebrow">Engineered in Germany</p>
           <h1>Automate, Analyze, Trade Smarter</h1>
@@ -88,7 +88,7 @@ export default function Page() {
         <div className="container">
           <h2 style={{ marginBottom: "1rem" }}>Membership &amp; Pricing</h2>
 
-          {/* A. Standalone “Free during Beta” block — full width on mobile */}
+          {/* A. Standalone "Free during Beta" block — full width on mobile */}
           <div className="pricing">
             <div className="pricing__beta card--elevated">
               <h3 style={{ marginBottom: "0.35rem" }}>
@@ -157,4 +157,3 @@ export default function Page() {
     </>
   );
 }
-
